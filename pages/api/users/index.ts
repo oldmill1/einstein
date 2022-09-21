@@ -8,8 +8,6 @@ export default async function usersHandler(
 ) {
   // Return users
   const allUsers = await prisma.user.findMany()
-  console.log({ allUsers })
-  console.log("env", process.env.DATABASE_URL)
   res.status(200).send({
     users: allUsers,
   })

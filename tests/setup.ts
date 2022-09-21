@@ -20,10 +20,8 @@ export async function setup() {
   const users = await prisma.user.createMany({
     data: mockData.users,
   })
-  console.log("Finished setting up test db", users)
 }
 
 export async function teardown() {
   const deletedUsers = await prisma.user.deleteMany({})
-  console.log("deleted users", deletedUsers)
 }
