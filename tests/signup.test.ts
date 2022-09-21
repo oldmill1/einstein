@@ -2,7 +2,7 @@ import { postman } from "./helpers/postman"
 import signupHandler from "../pages/api/auth/signup"
 import get from "lodash/fp/get"
 
-describe("Users", function () {
+describe("Signup", function () {
   test("Signs a user up successfully.", async function () {
     const signup = postman({
       method: "POST",
@@ -71,6 +71,6 @@ describe("Users", function () {
     await signupHandler(duplicateEmail.req, duplicateEmail.res)
     const received = duplicateEmail.res._getData()
     const message = get("message", received)
-    expect(message).toBe("An error occurred.")
+    expect(message).toBe("Something went wrong.")
   })
 })

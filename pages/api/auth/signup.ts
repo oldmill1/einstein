@@ -41,7 +41,7 @@ export default validateEmailAndPassword(async function signupHandler(
   if (match) {
     // Note: Don't tell the client the reason for the
     // error because of security reasons.
-    return res.status(400).send({ message: "An error occurred." })
+    return res.status(400).send({ message: "Something went wrong." })
   }
   // Grab the name from the request
   // and validate it using Zod
@@ -78,7 +78,7 @@ export default validateEmailAndPassword(async function signupHandler(
           return res.status(200).send(newUserCreated)
         }
       } // Else
-      return res.status(400).send({ message: "An error occurred." })
+      return res.status(400).send({ message: "Something went wrong." })
     })
   } catch (err) {
     // Return a 400 if zod schema complains about name
