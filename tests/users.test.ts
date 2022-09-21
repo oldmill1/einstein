@@ -7,10 +7,8 @@ describe("Users", function () {
     describe("/users", function () {
       test("Is initialized with two users in the database.", async function () {
         const empty = postman({})
-        const res = empty.res
-        const req = empty.req
-        await usersHandler(req, res)
-        const someUsers = res._getData()
+        await usersHandler(empty.req, empty.res)
+        const someUsers = empty.res._getData()
         expect(someUsers).toEqual({
           users: mockData.users,
         })
