@@ -4,8 +4,6 @@ import get from "lodash/fp/get"
 
 describe("Users", function () {
   test("Signs a user up successfully.", async function () {
-    // Mimic hitting the signup API handler
-    // and creating a new user named Sophie.
     const signup = postman({
       method: "POST",
       body: {
@@ -14,22 +12,15 @@ describe("Users", function () {
         plaintextPassword: "password",
       },
     })
-    const res = signup.res
-    const req = signup.req
-    await signupHandler(req, res)
-    const data = res._getData()
+    await signupHandler(signup.req, signup.res)
+    const data = signup.res._getData()
     const id = get("id", data)
     const email = get("email", data)
     expect(id).toBeDefined()
     expect(email).toBe("sophie@gmail.com")
-    // Note: We could add mock fetch where we
-    // get the newly created user by id using
-    // the handler defined inside user/[id].ts
   })
-  // Tests handling a request where an email is not provided
   test("Prevents signing up with an invalid email.", async function () {
-    // Mimic signing up with an invalid email address
-    const signupWithInvalidEmail = postman({
+    const weirdEmail = postman({
       method: "POST",
       body: {
         name: "Sophie",
@@ -37,16 +28,13 @@ describe("Users", function () {
         plaintextPassword: "password",
       },
     })
-    const res = signupWithInvalidEmail.res
-    const req = signupWithInvalidEmail.req
-    await signupHandler(req, res)
-    const data = res._getData()
+    await signupHandler(weirdEmail.req, weirdEmail.res)
+    const data = weirdEmail.res._getData()
     const message = get("message", data)
     expect(message).toBe("`Email` field provided was invalid.")
   })
   test("Prevents signing up without an email.", async function () {
-    // Mimic signing up with an invalid email address
-    const signupWithInvalidEmail = postman({
+    const noEmail = postman({
       method: "POST",
       body: {
         name: "Sophie",
@@ -54,10 +42,8 @@ describe("Users", function () {
         plaintextPassword: "password",
       },
     })
-    const res = signupWithInvalidEmail.res
-    const req = signupWithInvalidEmail.req
-    await signupHandler(req, res)
-    const data = res._getData()
+    await signupHandler(noEmail.req, noEmail.res)
+    const data = noEmail.res._getData()
     const message = get("message", data)
     expect(message).toBe("`Email` field provided was empty.")
   })
