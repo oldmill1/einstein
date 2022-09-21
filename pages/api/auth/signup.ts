@@ -6,10 +6,22 @@ import { PrismaClient } from "@prisma/client"
 import { validateEmailAndPassword } from "../../../middleware/middleware"
 const prisma = new PrismaClient()
 
+/**
+ * Sign up
+ *
+ * This method has a side effect:
+ * It creates a user in the database.
+ *
+ * If the values provided in the request
+ * are invalid, it returns various error
+ * responses to the client.
+ *
+ * Test: tests/signup.test.ts
+ */
 export default validateEmailAndPassword(async function signupHandler(
   req: NextApiRequest,
   res: NextApiResponse
-) {
+): Promise<void> {
   // Check to see if value for name was provided
   // If not, inform the user with an error
   const name = get("body.name", req)
