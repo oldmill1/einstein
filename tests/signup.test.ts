@@ -13,9 +13,9 @@ describe("Users", function () {
       },
     })
     await signupHandler(signup.req, signup.res)
-    const data = signup.res._getData()
-    const id = get("id", data)
-    const email = get("email", data)
+    const received = signup.res._getData()
+    const id = get("id", received)
+    const email = get("email", received)
     expect(id).toBeDefined()
     expect(email).toBe("sophie@gmail.com")
   })
@@ -29,8 +29,8 @@ describe("Users", function () {
       },
     })
     await signupHandler(weirdEmail.req, weirdEmail.res)
-    const data = weirdEmail.res._getData()
-    const message = get("message", data)
+    const received = weirdEmail.res._getData()
+    const message = get("message", received)
     expect(message).toBe("`Email` field provided was invalid.")
   })
   test("Prevents signing up without an email.", async function () {
@@ -43,8 +43,8 @@ describe("Users", function () {
       },
     })
     await signupHandler(noEmail.req, noEmail.res)
-    const data = noEmail.res._getData()
-    const message = get("message", data)
+    const received = noEmail.res._getData()
+    const message = get("message", received)
     expect(message).toBe("`Email` field provided was empty.")
   })
 })
