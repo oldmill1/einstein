@@ -1,6 +1,6 @@
 import usersHandler from "../pages/api/users"
-import { postman } from "./testsHelper"
-import { mockData } from "./fixtures"
+import { postman } from "./helpers/postman"
+import { mockData } from "./helpers/fixtures"
 
 describe("Users", function () {
   describe("GET", function () {

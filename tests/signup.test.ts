@@ -1,4 +1,4 @@
-import { postman } from "./testsHelper"
+import { postman } from "./helpers/postman"
 import signupHandler from "../pages/api/auth/signup"
 import get from "lodash/fp/get"
 

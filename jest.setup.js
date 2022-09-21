@@ -4,7 +4,7 @@
 // Used for __tests__/testing-library.js
 // Learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom/extend-expect"
-import { setup, teardown } from "./tests/setup"
+import { setup, teardown } from "./tests/helpers/setup"
 
 beforeAll(async function () {
   await setup()
