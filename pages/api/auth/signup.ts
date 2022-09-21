@@ -3,17 +3,16 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
 import { hash } from "bcrypt"
 import { PrismaClient } from "@prisma/client"
+import { validateEmailAndPassword } from "../../../middleware/middleware"
 const prisma = new PrismaClient()
 
-export default async function signupHandler(
+export default validateEmailAndPassword(async function signupHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Server side email validation:
   const email = get("body.email", req)
   // Search for this email in the database
   // If it exists, return a 400
-
   // Get the name and validate it using zod schema
   const name = get("body.name", req)
   const nameSchema = z.string().min(1)
@@ -26,9 +25,7 @@ export default async function signupHandler(
     return hash(plaintextPassword, 10).then(async function (hash) {
       if (hash) {
         // Prepare to save a new user into the database
-        // Create a new user object that has the same
-        // properties as the Prisma User model in the
-        // schema.
+        // Create an object adhering to schema.prisma
         const create = {
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -49,4 +46,4 @@ export default async function signupHandler(
       .status(400)
       .send({ message: "'Name' field provided was invalid." })
   }
-}
+})
