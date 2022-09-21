@@ -47,4 +47,18 @@ describe("Users", function () {
     const message = get("message", received)
     expect(message).toBe("`Email` field provided was empty.")
   })
+  test("Prevents duplicate email", async function () {
+    const duplicateEmail = postman({
+      method: "POST",
+      body: {
+        name: "Ankur",
+        email: "ataxali@gmail.com",
+        plaintextPassword: "password",
+      },
+    })
+    await signupHandler(duplicateEmail.req, duplicateEmail.res)
+    const received = duplicateEmail.res._getData()
+    const message = get("message", received)
+    expect(message).toBe("An error occurred.")
+  })
 })

@@ -14,7 +14,15 @@ export default validateEmailAndPassword(async function signupHandler(
   const email = get("body.email", req)
   // Search for this email in the database
   // If it exists, return a 400
-  // Todo: Do that ^
+  const match = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  })
+
+  if (match) {
+    return res.status(400).send({ message: "An error occurred." })
+  }
   // Get the name and validate it using the zod schema
   const name = get("body.name", req)
   const nameSchema = z.string().min(1)
