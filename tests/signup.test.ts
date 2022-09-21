@@ -38,7 +38,6 @@ describe("Users", function () {
       method: "POST",
       body: {
         name: "Sophie",
-        email: "",
         plaintextPassword: "password",
       },
     })
@@ -46,6 +45,19 @@ describe("Users", function () {
     const received = noEmail.res._getData()
     const message = get("message", received)
     expect(message).toBe("`Email` field provided was empty.")
+  })
+  test("Prevents signing up without an name.", async function () {
+    const noName = postman({
+      method: "POST",
+      body: {
+        email: "sophie@gmail.com",
+        plaintextPassword: "password",
+      },
+    })
+    await signupHandler(noName.req, noName.res)
+    const received = noName.res._getData()
+    const message = get("message", received)
+    expect(message).toBe("`Name` field provided was empty.")
   })
   test("Prevents duplicate email", async function () {
     const duplicateEmail = postman({
