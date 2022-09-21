@@ -2,8 +2,10 @@ import get from "lodash/fp/get"
 import { NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
 import { hash } from "bcrypt"
+import { PrismaClient } from "@prisma/client"
+const prisma = new PrismaClient()
 
-export default function signupHandler(
+export default async function signupHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -27,12 +29,17 @@ export default function signupHandler(
         // Create a new user object that has the same
         // properties as the Prisma User model in the
         // schema.
-        const userData = {
-          createdAt: new Date("September 20, 2022"),
-          updatedAt: new Date("September 20, 2022"),
+        const create = {
+          createdAt: new Date(),
+          updatedAt: new Date(),
           email,
+          name,
           password: hash,
         }
+        const newUserCreated = await prisma.user.create({
+          data: create,
+        })
+        return res.status(200).send(newUserCreated)
       } // Else
       return res.status(400).send({ message: "An error occurred." })
     })

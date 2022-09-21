@@ -1,3 +1,4 @@
+const password = "$2b$10$vt2HkIu6rFP3XMqvW.VAOOlfMiZq8/mpGM1q9ooxi8LfMQuJLH6u2"
 export const mockData = {
   users: [
     {
@@ -5,7 +6,7 @@ export const mockData = {
       createdAt: new Date("September 19, 2022"),
       updatedAt: new Date("September 19, 2022"),
       email: "ataxali@gmail.com",
-      password: "$2b$10$NRuF8mk9DnqQ/lNGkNdCgOnKilWeA1jKzDxLm83Gmx9wT9lV2J3oC",
+      password,
       name: "Ankur",
     },
     {
@@ -13,7 +14,7 @@ export const mockData = {
       createdAt: new Date("September 20, 2022"),
       updatedAt: new Date("September 20, 2022"),
       email: "bob@gmail.com",
-      password: "$2b$10$jPW5DT8QktEfm8RGkV.MZ.nMsTJhTStm8e57Vbu1uF4gvQB0URgTu",
+      password,
       name: "Bob",
     },
   ],
