@@ -6,3 +6,9 @@ export function expectFailure(res: MockResponse<Response>) {
   expect(message).toBeDefined()
   expect(message).toBe("Something went wrong.")
 }
+
+export function expectInvalidEmail(res: MockResponse<Response>) {
+  const message = get("message", res._getData())
+  expect(message).toBeDefined()
+  expect(message).toBe("`Email` field provided was invalid.")
+}

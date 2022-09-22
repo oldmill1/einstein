@@ -1,7 +1,7 @@
 import { postman } from "./helpers/postman"
 import loginHandler from "../pages/api/auth/login"
 import get from "lodash/fp/get"
-import { expectFailure } from "./helpers/helpers"
+import { expectFailure, expectInvalidEmail } from "./helpers/helpers"
 
 describe("Login", function () {
   test("Produces a public auth token for user with matching password.", async function () {
@@ -40,5 +40,16 @@ describe("Login", function () {
     })
     await loginHandler(wrongPassword.req, wrongPassword.res)
     expectFailure(wrongPassword.res)
+  })
+  test("Handles invalid email", async function () {
+    const invalidEmail = postman({
+      method: "POST",
+      body: {
+        email: "@gmail.com",
+        plaintextPassword: "1234",
+      },
+    })
+    await loginHandler(invalidEmail.req, invalidEmail.res)
+    expectInvalidEmail(invalidEmail.res)
   })
 })
