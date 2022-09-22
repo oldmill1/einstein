@@ -1,6 +1,7 @@
 import { postman } from "./helpers/postman"
 import signupHandler from "../pages/api/auth/signup"
 import get from "lodash/fp/get"
+import { expectFailure, expectInvalidEmail } from "./helpers/helpers"
 
 describe("Signup", function () {
   test("Signs a user up successfully.", async function () {
@@ -20,7 +21,7 @@ describe("Signup", function () {
     expect(email).toBe("sophie@gmail.com")
   })
   test("Prevents signing up with an invalid email.", async function () {
-    const weirdEmail = postman({
+    const invalidEmail = postman({
       method: "POST",
       body: {
         name: "Sophie",
@@ -28,10 +29,8 @@ describe("Signup", function () {
         plaintextPassword: "password",
       },
     })
-    await signupHandler(weirdEmail.req, weirdEmail.res)
-    const received = weirdEmail.res._getData()
-    const message = get("message", received)
-    expect(message).toBe("`Email` field provided was invalid.")
+    await signupHandler(invalidEmail.req, invalidEmail.res)
+    expectInvalidEmail(invalidEmail.res)
   })
   test("Prevents signing up without an email.", async function () {
     const noEmail = postman({
@@ -69,8 +68,6 @@ describe("Signup", function () {
       },
     })
     await signupHandler(duplicateEmail.req, duplicateEmail.res)
-    const received = duplicateEmail.res._getData()
-    const message = get("message", received)
-    expect(message).toBe("Something went wrong.")
+    expectFailure(duplicateEmail.res)
   })
 })
