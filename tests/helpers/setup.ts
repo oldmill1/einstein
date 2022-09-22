@@ -23,5 +23,6 @@ export async function setup() {
 }
 
 export async function teardown() {
+  const deletedEvents = await prisma.event.deleteMany({})
   const deletedUsers = await prisma.user.deleteMany({})
 }

@@ -14,3 +14,7 @@ export function expectInvalidEmail(res: MockResponse<Response>) {
   expect(message).toBeDefined()
   expect(message).toBe("`Email` field provided was invalid.")
 }
+
+export function expectOK(res: MockResponse<Response>) {
+  expect(res._getStatusCode()).toBe(200)
+}
