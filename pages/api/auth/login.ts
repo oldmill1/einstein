@@ -18,15 +18,17 @@ export default validateEmailAndPassword(async function loginHandler(
     },
   })
   if (user) {
+    // If the user exists, check if the password matches
+    // the one provided in the request
     const plaintextPassword = get("body.plaintextPassword", req)
     const success = await compare(plaintextPassword, user.password)
+    // If the match is successful
     if (success) {
-      // Create a secure key
+      // Create a secure key using jsonwebtoken
       const claims = {
         sub: user.id,
         email: user.email,
       }
-      // Never ever share the apiSecret
       let apiSecret: Secret
       if (process.env.API_SECRET) {
         apiSecret = process.env.API_SECRET
@@ -36,10 +38,9 @@ export default validateEmailAndPassword(async function loginHandler(
         // Return the secure key to the client
         return res.status(200).send({ authToken: jwt })
       }
-    } // Else
-    return res.status(400).send({
-      message: "Something went wrong.",
-    })
-  }
-  console.log({ match: user })
+    }
+  } // Else:
+  return res.status(400).send({
+    message: "Something went wrong.",
+  })
 })

@@ -11,16 +11,17 @@ export function validateEmailAndPassword(fn: NextApiHandler) {
     }
     const pass = get("body.plaintextPassword", req)
     if (!pass) {
-      res
+      return res
         .status(400)
         .send({ message: "`plaintextPassword` field provided was empty." })
-      return
     }
     try {
       z.string().email().parse(email)
       return await fn(req, res)
     } catch (err) {
-      res.status(400).send({ message: "`Email` field provided was invalid." })
+      return res
+        .status(400)
+        .send({ message: "`Email` field provided was invalid." })
     }
   }
 }
