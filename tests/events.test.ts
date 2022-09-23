@@ -35,6 +35,17 @@ describe("Events", function () {
         await eventHandler(getEvent.req, getEvent.res)
         expectFailure(getEvent.res)
       })
+      test("Handles 405", async function () {
+        const wontWork = postman({
+          auth: true,
+          method: "POST",
+          body: {
+            id: "632df76be97db3548e069c8a",
+          },
+        })
+        await eventHandler(wontWork.req, wontWork.res)
+        expect(wontWork.res._getStatusCode()).toBe(405)
+      })
     })
   })
   describe("POST", function () {
