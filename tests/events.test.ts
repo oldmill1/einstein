@@ -1,6 +1,6 @@
 import { postman } from "./helpers/postman"
 import { expectOK } from "./helpers/helpers"
-import { eventsHandler } from "../pages/api/events"
+import eventsHandler from "../pages/api/events"
 
 describe("Events", function () {
   describe("POST", function () {

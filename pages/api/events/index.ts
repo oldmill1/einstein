@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next"
 import isEqual from "lodash/fp/isEqual"
 import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
+import { validateSignature } from "../../../middleware/middleware"
 
-export async function eventsHandler(
+export default validateSignature(async function eventsHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
@@ -46,4 +47,4 @@ export async function eventsHandler(
     })
     return res.status(200).send(newEventCreated)
   } // End of "POST" handler
-}
+})
