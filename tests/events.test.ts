@@ -3,6 +3,8 @@ import { expectOK } from "./helpers/helpers"
 import eventsHandler from "../pages/api/events"
 import get from "lodash/fp/get"
 import eventHandler from "../pages/api/events/eventHandler"
+import { mockData } from "./helpers/fixtures"
+import first from "lodash/fp/first"
 
 describe("Events", function () {
   describe("GET", function () {
@@ -11,11 +13,17 @@ describe("Events", function () {
         const getEvent = postman({
           auth: true,
           query: {
-            id: "",
+            id: "632df76be97db3548e069c8a",
           },
         })
+        const expected = first(mockData.events)
         await eventHandler(getEvent.req, getEvent.res)
         expectOK(getEvent.res)
+        const received = getEvent.res._getData()
+        expect(received).toBeDefined()
+        const id = get("id", received)
+        expect(id).toBeDefined()
+        expect(received).toStrictEqual(expected)
       })
     })
   })

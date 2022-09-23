@@ -7,6 +7,7 @@
 // variables inside .env.test (as opposed to .env
 // when being run normally).
 //
+// Depreciated:
 // All the tests are required to be run sequentially,
 // or otherwise the multiple databases would
 // interfere with each other. Because of this the
@@ -16,9 +17,12 @@ import { mockData } from "./fixtures"
 const prisma = new PrismaClient()
 
 export async function setup() {
-  // Insert some users into the database
+  // Insert fixtures into the DB
   const users = await prisma.user.createMany({
     data: mockData.users,
+  })
+  const events = await prisma.event.createMany({
+    data: mockData.events,
   })
 }
 
