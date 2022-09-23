@@ -1,5 +1,5 @@
 import { postman } from "./helpers/postman"
-import { expectOK } from "./helpers/helpers"
+import { expectFailure, expectOK } from "./helpers/helpers"
 import eventsHandler from "../pages/api/events"
 import get from "lodash/fp/get"
 import eventHandler from "../pages/api/events/[id]"
@@ -24,6 +24,16 @@ describe("Events", function () {
         const id = get("id", received)
         expect(id).toBeDefined()
         expect(received).toStrictEqual(expected)
+      })
+      test("Handles event not found", async function () {
+        const getEvent = postman({
+          auth: true,
+          query: {
+            id: "something-else",
+          },
+        })
+        await eventHandler(getEvent.req, getEvent.res)
+        expectFailure(getEvent.res)
       })
     })
   })

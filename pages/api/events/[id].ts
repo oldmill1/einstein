@@ -3,6 +3,7 @@ import isEqual from "lodash/fp/isEqual"
 import { PrismaClient } from "@prisma/client"
 import get from "lodash/fp/get"
 const prisma = new PrismaClient()
+const validObjectId = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
 
 export default async function eventHandler(
   req: NextApiRequest,
@@ -11,7 +12,7 @@ export default async function eventHandler(
   const { query, method } = req
   // Validate user input
   const id = get("id", query) as string
-  if (!id) {
+  if (!id || !validObjectId.test(id)) {
     return res.status(400).send({
       message: "Something went wrong.",
     })
