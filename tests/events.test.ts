@@ -11,7 +11,7 @@ describe("Events", function () {
         auth: true,
         body: {
           startDate: new Date("November 16, 2022"),
-          finishDate: new Date("November 16, 2022"),
+          finishDate: new Date("November 17, 2022"),
         },
       })
       await eventsHandler(newEvent.req, newEvent.res)
@@ -25,7 +25,7 @@ describe("Events", function () {
         method: "POST",
         auth: true,
         body: {
-          finishDate: new Date("November 16, 2022"),
+          finishDate: new Date("November 17, 2022"),
         },
       })
       await eventsHandler(absentSDate.req, absentSDate.res)
@@ -40,7 +40,7 @@ describe("Events", function () {
         auth: true,
         body: {
           startDate: "August 21, 2022",
-          finishDate: new Date("November 16, 2022"),
+          finishDate: new Date("November 17, 2022"),
         },
       })
       await eventsHandler(invalidSDate.req, invalidSDate.res)
@@ -89,7 +89,7 @@ describe("Events", function () {
         method: "POST",
         body: {
           startDate: new Date("November 16, 2022"),
-          finishDate: new Date("November 16, 2022"),
+          finishDate: new Date("November 17, 2022"),
         },
       })
       await eventsHandler(unsigned.req, unsigned.res)
@@ -105,7 +105,15 @@ describe("Events", function () {
           startDate: new Date("November 16, 2022"),
           finishDate: new Date("November 16, 2022"),
         },
+        auth: true,
       })
+      await eventsHandler(same.req, same.res)
+      expect(same.res._getStatusCode()).toEqual(400)
+      const received = same.res._getData()
+      const message = get("message", received)
+      expect(message).toEqual(
+        "The fields `startDate` and `finishDate` are equal."
+      )
     })
   })
 })

@@ -6,7 +6,7 @@ import { validateSignature } from "../../../middleware/middleware"
 import { Secret, verify } from "jsonwebtoken"
 import { z } from "zod"
 import get from "lodash/fp/get"
-
+import compareAsc from "date-fns/compareAsc"
 
 export default validateSignature(async function eventsHandler(
   req: NextApiRequest,
@@ -41,6 +41,11 @@ export default validateSignature(async function eventsHandler(
       })
     }
     // Date compare functions
+    if (compareAsc(startDate, finishDate) === 0) {
+      return res.status(400).send({
+        message: "The fields `startDate` and `finishDate` are equal.",
+      })
+    }
 
     // An event belongs to a user.
     // The user is passed in through an authorisation header.
