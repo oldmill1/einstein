@@ -2,8 +2,23 @@ import { postman } from "./helpers/postman"
 import { expectOK } from "./helpers/helpers"
 import eventsHandler from "../pages/api/events"
 import get from "lodash/fp/get"
+import eventHandler from "../pages/api/events/eventHandler"
 
 describe("Events", function () {
+  describe("GET", function () {
+    describe("/events/[id]", function () {
+      test("Gets a single event", async function () {
+        const getEvent = postman({
+          auth: true,
+          query: {
+            id: "",
+          },
+        })
+        await eventHandler(getEvent.req, getEvent.res)
+        expectOK(getEvent.res)
+      })
+    })
+  })
   describe("POST", function () {
     test("User can create a new event.", async function () {
       const newEvent = postman({
@@ -39,7 +54,7 @@ describe("Events", function () {
         method: "POST",
         auth: true,
         body: {
-          startDate: "August 21, 2022",
+          startDate: "XYZ",
           finishDate: new Date("November 17, 2022"),
         },
       })
@@ -71,7 +86,7 @@ describe("Events", function () {
         auth: true,
         body: {
           startDate: new Date("November 16, 2022"),
-          finishDate: "November 16, 2022",
+          finishDate: "XYZ",
         },
       })
       await eventsHandler(invalidFDate.req, invalidFDate.res)

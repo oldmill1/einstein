@@ -49,8 +49,14 @@ export default validateSignature(async function eventsHandler(
   // Handle a POST request...
   if (isEqual(method, "POST")) {
     // Unpack the body
-    const startDate = get("startDate", body)
-    const finishDate = get("finishDate", body)
+    let startDate = get("startDate", body)
+    let finishDate = get("finishDate", body)
+    if (typeof startDate === "string") {
+      startDate = new Date(startDate)
+    }
+    if (typeof finishDate === "string") {
+      finishDate = new Date(finishDate)
+    }
     // Validate user input:
     const errorMessage = validateStartFinishDates(startDate, finishDate)
     if (errorMessage) {

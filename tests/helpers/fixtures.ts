@@ -18,4 +18,14 @@ export const mockData = {
       name: "Bob",
     },
   ],
+  events: [
+    {
+      id: "632df76be97db3548e069c8a",
+      createdAt: new Date("September 21, 2022"),
+      updatedAt: new Date("September 21, 2022"),
+      startDate: new Date("September 20, 2022"),
+      finishDate: new Date("September 20, 2022"),
+      userId: "632a5236dbc2c6c3ed9df153",
+    },
+  ],
 }
