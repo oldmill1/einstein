@@ -9,6 +9,7 @@ export default async function eventHandler(
   res: NextApiResponse
 ): Promise<void> {
   const { query, method } = req
+  // Validate user input
   const id = get("id", query) as string
   if (!id) {
     return res.status(400).send({

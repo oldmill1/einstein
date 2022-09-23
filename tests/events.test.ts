@@ -2,7 +2,7 @@ import { postman } from "./helpers/postman"
 import { expectOK } from "./helpers/helpers"
 import eventsHandler from "../pages/api/events"
 import get from "lodash/fp/get"
-import eventHandler from "../pages/api/events/eventHandler"
+import eventHandler from "../pages/api/events/[id]"
 import { mockData } from "./helpers/fixtures"
 import first from "lodash/fp/first"
 
