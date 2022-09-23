@@ -13,13 +13,13 @@ describe("Events", function () {
         body: {
           startDate: new Date("September 20, 2022"),
           finishDate: new Date("September 20, 2022"),
-          user: {
-            id: "632a5236dbc2c6c3ed9df153",
-          },
         },
       })
       await eventsHandler(newEvent.req, newEvent.res)
       expectOK(newEvent.res)
+      const received = newEvent.res._getData()
+      const id = get("id", received)
+      expect(id).toBeDefined()
     })
     test("Handles unsigned request", async function () {
       const unsigned = postman({
@@ -27,9 +27,6 @@ describe("Events", function () {
         body: {
           startDate: new Date("September 20, 2022"),
           finishDate: new Date("September 20, 2022"),
-          user: {
-            id: "632a5236dbc2c6c3ed9df153",
-          },
         },
       })
       await eventsHandler(unsigned.req, unsigned.res)
