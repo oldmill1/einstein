@@ -7,6 +7,7 @@ import { Secret, verify } from "jsonwebtoken"
 import { z } from "zod"
 import get from "lodash/fp/get"
 
+
 export default validateSignature(async function eventsHandler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -39,6 +40,8 @@ export default validateSignature(async function eventsHandler(
         message: "The field `startDate` or `finishDate` was not a date.",
       })
     }
+    // Date compare functions
+
     // An event belongs to a user.
     // The user is passed in through an authorisation header.
     // Verify that auth token is authentic using jsonwebtoken

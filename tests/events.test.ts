@@ -6,13 +6,12 @@ import get from "lodash/fp/get"
 describe("Events", function () {
   describe("POST", function () {
     test("User can create a new event", async function () {
-      // Try to create a new event
       const newEvent = postman({
         method: "POST",
         auth: true,
         body: {
-          startDate: new Date("September 20, 2022"),
-          finishDate: new Date("September 20, 2022"),
+          startDate: new Date("November 16, 2022"),
+          finishDate: new Date("November 16, 2022"),
         },
       })
       await eventsHandler(newEvent.req, newEvent.res)
@@ -26,7 +25,7 @@ describe("Events", function () {
         method: "POST",
         auth: true,
         body: {
-          finishDate: new Date("September 20, 2022"),
+          finishDate: new Date("November 16, 2022"),
         },
       })
       await eventsHandler(absentSDate.req, absentSDate.res)
@@ -41,7 +40,7 @@ describe("Events", function () {
         auth: true,
         body: {
           startDate: "August 21, 2022",
-          finishDate: new Date("September 20, 2022"),
+          finishDate: new Date("November 16, 2022"),
         },
       })
       await eventsHandler(invalidSDate.req, invalidSDate.res)
@@ -57,7 +56,7 @@ describe("Events", function () {
         method: "POST",
         auth: true,
         body: {
-          startDate: new Date("September 20, 2022"),
+          startDate: new Date("November 16, 2022"),
         },
       })
       await eventsHandler(absentFDate.req, absentFDate.res)
@@ -73,8 +72,8 @@ describe("Events", function () {
         method: "POST",
         auth: true,
         body: {
-          startDate: new Date("September 20, 2022"),
-          finishDate: "Too bad about sorrow",
+          startDate: new Date("November 16, 2022"),
+          finishDate: "November 16, 2022",
         },
       })
       await eventsHandler(invalidFDate.req, invalidFDate.res)
@@ -89,8 +88,8 @@ describe("Events", function () {
       const unsigned = postman({
         method: "POST",
         body: {
-          startDate: new Date("September 20, 2022"),
-          finishDate: new Date("September 20, 2022"),
+          startDate: new Date("November 16, 2022"),
+          finishDate: new Date("November 16, 2022"),
         },
       })
       await eventsHandler(unsigned.req, unsigned.res)
@@ -98,6 +97,15 @@ describe("Events", function () {
       const received = unsigned.res._getData()
       const message = get("message", received)
       expect(message).toBe("Not authorized.")
+    })
+    test("finishDate is not startDate", async function () {
+      const same = postman({
+        method: "POST",
+        body: {
+          startDate: new Date("November 16, 2022"),
+          finishDate: new Date("November 16, 2022"),
+        },
+      })
     })
   })
 })
