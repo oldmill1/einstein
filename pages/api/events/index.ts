@@ -8,43 +8,53 @@ import { z } from "zod"
 import get from "lodash/fp/get"
 import compareAsc from "date-fns/compareAsc"
 
+function validateStartFinishDates(
+  startDate: Date,
+  finishDate: Date
+): string | null {
+  // Note: Once we encounter an error, we return immediately
+  let error: string | null = null
+  // Check if required fields are present
+  if (!startDate || !finishDate) {
+    error = "The field `startDate` or `finishDate` was absent."
+    return error
+  }
+  // Validate the startDate field
+  try {
+    z.date().parse(startDate)
+  } catch (err) {
+    error = "The field `startDate` was not a date."
+    return error
+  }
+  // Validate the finishDate field
+  try {
+    z.date().parse(finishDate)
+  } catch (err) {
+    error = "The field `finishDate` was not a date."
+    return error
+  }
+  // Validate the Date fields:
+  if (compareAsc(startDate, finishDate) > -1) {
+    error = "Check dates."
+    return error
+  }
+  return error
+}
+
 export default validateSignature(async function eventsHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
   const { body, method } = req
-  // Handle POST request:
+  // Handle a POST request...
   if (isEqual(method, "POST")) {
     // Unpack the body
     const startDate = get("startDate", body)
     const finishDate = get("finishDate", body)
     // Validate user input:
-    if (!startDate || !finishDate) {
-      return res.status(400).send({
-        message: "The field `startDate` or `finishDate` was absent.",
-      })
-    }
-    // Validate the startDate field
-    try {
-      z.date().parse(startDate)
-    } catch (err) {
-      return res.status(400).send({
-        message: "The field `startDate` or `finishDate` was not a date.",
-      })
-    }
-    // Validate the endDate field
-    try {
-      z.date().parse(finishDate)
-    } catch (err) {
-      return res.status(400).send({
-        message: "The field `startDate` or `finishDate` was not a date.",
-      })
-    }
-    // Date compare functions
-    if (compareAsc(startDate, finishDate) === 0) {
-      return res.status(400).send({
-        message: "The fields `startDate` and `finishDate` are equal.",
-      })
+    const errorMessage = validateStartFinishDates(startDate, finishDate)
+    if (errorMessage) {
+      return res.status(400).send({ message: errorMessage })
     }
 
     // An event belongs to a user.

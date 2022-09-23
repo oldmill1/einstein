@@ -5,7 +5,7 @@ import get from "lodash/fp/get"
 
 describe("Events", function () {
   describe("POST", function () {
-    test("User can create a new event", async function () {
+    test("User can create a new event.", async function () {
       const newEvent = postman({
         method: "POST",
         auth: true,
@@ -20,7 +20,7 @@ describe("Events", function () {
       const id = get("id", received)
       expect(id).toBeDefined()
     })
-    test("Handles absent startDate", async function () {
+    test("Handles absent startDate.", async function () {
       const absentSDate = postman({
         method: "POST",
         auth: true,
@@ -34,7 +34,7 @@ describe("Events", function () {
       expect(message).toBeDefined()
       expect(message).toBe("The field `startDate` or `finishDate` was absent.")
     })
-    test("Handles invalid startDate", async function () {
+    test("Handles invalid startDate.", async function () {
       const invalidSDate = postman({
         method: "POST",
         auth: true,
@@ -47,11 +47,9 @@ describe("Events", function () {
       const received = invalidSDate.res._getData()
       const message = get("message", received)
       expect(message).toBeDefined()
-      expect(message).toBe(
-        "The field `startDate` or `finishDate` was not a date."
-      )
+      expect(message).toBe("The field `startDate` was not a date.")
     })
-    test("Handles absent finishDate", async function () {
+    test("Handles absent finishDate.", async function () {
       const absentFDate = postman({
         method: "POST",
         auth: true,
@@ -67,7 +65,7 @@ describe("Events", function () {
         "The field `startDate` or `finishDate` was absent."
       )
     })
-    test("Handles invalid finishDate", async function () {
+    test("Handles invalid finishDate.", async function () {
       const invalidFDate = postman({
         method: "POST",
         auth: true,
@@ -80,11 +78,9 @@ describe("Events", function () {
       const received = invalidFDate.res._getData()
       const message = get("message", received)
       expect(message).toBeDefined()
-      expect(message).toBe(
-        "The field `startDate` or `finishDate` was not a date."
-      )
+      expect(message).toBe("The field `finishDate` was not a date.")
     })
-    test("Handles unsigned request", async function () {
+    test("Handles unsigned request.", async function () {
       const unsigned = postman({
         method: "POST",
         body: {
@@ -98,7 +94,7 @@ describe("Events", function () {
       const message = get("message", received)
       expect(message).toBe("Not authorized.")
     })
-    test("finishDate is not startDate", async function () {
+    test("Handles dates are the same.", async function () {
       const same = postman({
         method: "POST",
         body: {
@@ -111,9 +107,7 @@ describe("Events", function () {
       expect(same.res._getStatusCode()).toEqual(400)
       const received = same.res._getData()
       const message = get("message", received)
-      expect(message).toEqual(
-        "The fields `startDate` and `finishDate` are equal."
-      )
+      expect(message).toBe("Check dates.")
     })
   })
 })
