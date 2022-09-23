@@ -52,4 +52,17 @@ describe("Login", function () {
     await loginHandler(invalidEmail.req, invalidEmail.res)
     expectInvalidEmail(invalidEmail.res)
   })
+  test("Logs another person in", async function () {
+    const login = postman({
+      method: "POST",
+      body: {
+        email: "bob@gmail.com",
+        plaintextPassword: "temp",
+      },
+    })
+    await loginHandler(login.req, login.res)
+    const received = login.res._getData()
+    const authToken = get("authToken", received)
+    expect(authToken).toBeDefined()
+  })
 })
