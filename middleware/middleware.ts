@@ -43,9 +43,8 @@ export function validateSignature(fn: NextApiHandler) {
         if (!err && decoded) {
           if (decoded.sub && typeof decoded.sub === "string") {
             // Check if this person exists in our database
-            // Use prisma client to perform the search
-            // Only if the person exists in our database
-            // should we proceed with the HOF.
+            // Use Prisma Client to perform the search.
+            // Proceed only if user exists in DB.
             let id: string
             id = decoded.sub
             const match = await prisma.user.findUnique({
@@ -55,10 +54,10 @@ export function validateSignature(fn: NextApiHandler) {
             })
             if (match) {
               return await fn(req, res)
-            } // Error with match
+            } // Error matching:
             return res.status(401).send({ message: "Not authorized." })
           }
-        } // Error with verify
+        } // Error verifying:
         return res.status(401).send({ message: "Not authorized." })
       }
     )
