@@ -109,5 +109,20 @@ describe("Events", function () {
       const message = get("message", received)
       expect(message).toBe("Check dates.")
     })
+    test("Error if startDate come after finishDate.", async function () {
+      const same = postman({
+        method: "POST",
+        body: {
+          startDate: new Date("December 1 , 2022"),
+          finishDate: new Date("November 30, 2022"),
+        },
+        auth: true,
+      })
+      await eventsHandler(same.req, same.res)
+      expect(same.res._getStatusCode()).toEqual(400)
+      const received = same.res._getData()
+      const message = get("message", received)
+      expect(message).toBe("Check dates.")
+    })
   })
 })

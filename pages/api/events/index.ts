@@ -33,7 +33,7 @@ function validateStartFinishDates(
     error = "The field `finishDate` was not a date."
     return error
   }
-  // Validate the Date fields:
+  // Error if startDate comes after or lands on finishDate
   if (compareAsc(startDate, finishDate) > -1) {
     error = "Check dates."
     return error
