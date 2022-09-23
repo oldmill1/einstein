@@ -4,6 +4,8 @@ import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 import { validateSignature } from "../../../middleware/middleware"
 import { Secret, verify } from "jsonwebtoken"
+import { z } from "zod"
+import get from "lodash/fp/get"
 
 export default validateSignature(async function eventsHandler(
   req: NextApiRequest,
@@ -12,18 +14,41 @@ export default validateSignature(async function eventsHandler(
   const { body, method } = req
   // Handle POST request:
   if (isEqual(method, "POST")) {
-    // An event belongs to a user.
-    // The user is passed in an authorisation header
-    if (!process.env.API_SECRET) {
-      return res.status(400).send({ message: "Something went wrong." })
+    // Unpack the body
+    const startDate = get("startDate", body)
+    const finishDate = get("finishDate", body)
+    // Validate user input:
+    if (!startDate || !finishDate) {
+      return res.status(400).send({
+        message: "The field `startDate` or `finishDate` was absent.",
+      })
     }
-    // Verify the auth token is authentic using jsonwebtoken
-    let apiSecret: Secret = process.env.API_SECRET
+    // Validate the startDate field
+    try {
+      z.date().parse(startDate)
+    } catch (err) {
+      return res.status(400).send({
+        message: "The field `startDate` or `finishDate` was not a date.",
+      })
+    }
+    // Validate the endDate field
+    try {
+      z.date().parse(finishDate)
+    } catch (err) {
+      return res.status(400).send({
+        message: "The field `startDate` or `finishDate` was not a date.",
+      })
+    }
+    // An event belongs to a user.
+    // The user is passed in through an authorisation header.
+    // Verify that auth token is authentic using jsonwebtoken
+    let apiSecret: Secret = process.env.API_SECRET as string
+    // Note: Without this return, function doesn't work
     return verify(
       req.headers.authorization!,
       apiSecret,
       async function (err, decoded) {
-        // Once the auth token is verified, obtain underlying user
+        // Auth token is verified; Obtain underlying user
         if (!err && decoded) {
           if (decoded.sub && typeof decoded.sub === "string") {
             let id: string
@@ -37,7 +62,7 @@ export default validateSignature(async function eventsHandler(
             if (match) {
               // Prepare to add a new event to the DB.
               // The information is stored in the body of the request.
-              const { startDate, finishDate } = body
+
               // Finally, insert the new event into the database
               // using the prisma client(), taking note to
               // use `npx prisma generate` at least once.
@@ -58,6 +83,8 @@ export default validateSignature(async function eventsHandler(
             }
           }
         }
+        // Error during verification
+        return res.status(400).send({ message: "Something went wrong." })
       }
     )
   } // End of "POST" handler

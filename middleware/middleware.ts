@@ -2,8 +2,6 @@ import { NextApiHandler, NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
 import get from "lodash/fp/get"
 import { Secret, verify } from "jsonwebtoken"
-import { PrismaClient } from "@prisma/client"
-const prisma = new PrismaClient()
 
 export function validateEmailAndPassword(fn: NextApiHandler) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
