@@ -5,6 +5,7 @@ import get from "lodash/fp/get"
 import eventHandler from "../pages/api/events/[id]"
 import { mockData } from "./helpers/fixtures"
 import first from "lodash/fp/first"
+import isEqual from "lodash/fp/isEqual"
 
 describe("Events", function () {
   describe("GET", function () {
@@ -60,11 +61,18 @@ describe("Events", function () {
       })
       // Filter: User
       test("Get a list of events filtered by user", async function () {
+        const defaultUserId = first(mockData.users)!.id
         const byUser = postman({
           query: {
-            id: first(mockData.users)
+            userId: defaultUserId,
           },
         })
+        await eventsHandler(byUser.req, byUser.res)
+        const received = byUser.res._getData()
+        const expected = mockData.events.filter((e) =>
+          isEqual(e.userId, defaultUserId)
+        )
+        expect(received).toStrictEqual(expected)
       })
     })
   })

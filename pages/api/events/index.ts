@@ -7,6 +7,7 @@ import { Secret, verify } from "jsonwebtoken"
 import { z } from "zod"
 import get from "lodash/fp/get"
 import compareAsc from "date-fns/compareAsc"
+import isEmpty from "lodash/fp/isEmpty"
 
 function validateStartFinishDates(
   startDate: Date,
@@ -45,16 +46,39 @@ export default validateSignature(async function eventsHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  const { body, method } = req
+  const { query, method } = req
+  // Handler GET request:
   if (isEqual(method, "GET")) {
-    // Return events
-    const events = await prisma.event.findMany()
-    return res.status(200).send(events)
+    // Returning events:
+    // Check for filters (passed in using query params)
+    // Return some events if there is no filter passed in
+    if (isEmpty(query)) {
+      // Get some events using prisma and return using res
+      const events = await prisma.event.findMany()
+      return res.status(200).send(events)
+    }
+    // Filters:
+    // If the `userId` filter is present,
+    // only return events that belong to that person.
+    const userId = get("userId", query)
+    // Type check needed for Prisma findMany
+    // and also for us to be sane
+    if (userId && typeof userId === "string") {
+      const events = await prisma.event.findMany({
+        where: {
+          userId,
+        },
+      })
+      return res.status(200).send(events)
+    }
+    return res.status(400).send({
+      message: "Something went wrong.",
+    })
   }
-  // Handle a POST request...
+  // Handle a POST request:
   if (isEqual(method, "POST")) {
     return await handlePost(req, res)
-  } // End of "POST" handler
+  }
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
