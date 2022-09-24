@@ -90,7 +90,7 @@ describe("Events", function () {
       })
       // Filters: Date
       // date: "June 21, 2022"
-      test("Retrieves events starting on a particular day.", async function () {
+      test("Retrieves events starting on a particular date.", async function () {
         const juneDayEvents = postman({
           query: {
             date: "June 21, 2022",
@@ -104,6 +104,25 @@ describe("Events", function () {
         expect(expected).toStrictEqual(received)
       })
       // between: { "Date 1", "Date 2" }
+      test("Retrieves events between two dates", async function () {
+        const start = "September 1, 2022"
+        const finish = "September 31, 2022"
+        const events = postman({
+          query: {
+            interval: {
+              lte: finish,
+              gte: start,
+            },
+          },
+        })
+        await eventsHandler(events.req, events.res)
+        const received = events.res._getData()
+        const expected = mockData.events.filter(
+          (e) =>
+            e.startDate <= new Date(finish) && e.startDate >= new Date(start)
+        )
+        expect(expected).toStrictEqual(received)
+      })
       // gte: "Some Date"
       // lte: "Some Date"
     })

@@ -73,7 +73,6 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   // only return events that belong to that person.
   const userId = get("userId", query)
   // Type check needed for Prisma findMany
-  // and also for us to be sane
   if (userId && typeof userId === "string" && validObjectId.test(userId)) {
     const events = await prisma.event.findMany({
       where: {
@@ -82,6 +81,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     })
     return res.status(200).send(events)
   }
+  // Get a list of events using date EQUALS
   const date = get("date", query)
   if (date && typeof date === "string") {
     const events = await prisma.event.findMany({
@@ -93,6 +93,23 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     })
     return res.status(200).send(events)
   }
+  // Get a list of events using lte & gte
+  const interval = get("interval", query)
+  if (interval && typeof interval === "object") {
+    const lte = get("lte", interval) as string
+    const gte = get("gte", interval) as string
+    const events = await prisma.event.findMany({
+      where: {
+        startDate: {
+          lte: new Date(lte),
+          gte: new Date(gte),
+        },
+      },
+    })
+    return res.status(200).send(events)
+  }
+
+  // Else All:
   return res.status(400).send({
     message: "Something went wrong.",
   })
