@@ -43,36 +43,48 @@ function validateStartFinishDates(
   return error
 }
 
+/**
+ * Handler for /events
+ * GET: Returns a list of event records, filtered optionally by a POST body.
+ * POST: Creates a new event
+ * Tests: tests/events.test.js
+ */
 export default validateSignature(async function eventsHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
   const method = get("method", req)
   // Handle GET request:
+  // Return a list of records.
   if (isEqual(method, "GET")) {
-    return await handleGet(req, res)
+    return await getHandler(req, res)
   }
   // Handle a POST request:
+  // Create a new record.
   if (isEqual(method, "POST")) {
-    return await handlePost(req, res)
+    return await postHandler(req, res)
   }
 })
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse) {
-  // Returning events:
+// Handle GET requests to /events
+// Returns an optionally filtered list of records.
+// Performs a findMany Prisma query.
+async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   // Check for filters (passed in using query params)
-  // Return some events if there is no filter passed in
   const { query } = req
+  // Return some events if no filters present in the request.
   if (isEmpty(query)) {
-    // Get some events using prisma and return using res
+    // Get some events using prisma and return using res.
     const events = await prisma.event.findMany()
     return res.status(200).send(events)
   }
-  // Filters: userId
-  // If the `userId` filter is present,
-  // only return events that belong to that person.
+  // Handle Filters:
+  // Filter: userId
+  // If the `userId` filter is present, only return events
+  // that belong to that person.
   const userId = get("userId", query)
-  // Type check needed for Prisma findMany
+  // Note: The way this is, filters cannot be "combined".
+  // A filter, once present, RETURNS.
   if (userId && typeof userId === "string" && validObjectId.test(userId)) {
     const events = await prisma.event.findMany({
       where: {
@@ -139,7 +151,10 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   })
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+// Handle POST requests to /events
+// Creates a new event record.
+// Performs a create Primsa query.
+async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { body } = req
   // Unpack the body
   let startDate = get("startDate", body)
