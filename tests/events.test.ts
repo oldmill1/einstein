@@ -50,11 +50,21 @@ describe("Events", function () {
     describe("/events", function () {
       // Get a list of events from the DB
       test("Gets a list of events in the database", async function () {
+        // This list would be events that have been pre-created
+        // for use in tests.
         const list = postman({})
         await eventsHandler(list.req, list.res)
         const received = list.res._getData()
         const expected = mockData.events
         expect(received).toStrictEqual(expected)
+      })
+      // Filter: User
+      test("Get a list of events filtered by user", async function () {
+        const byUser = postman({
+          query: {
+            id: first(mockData.users)
+          },
+        })
       })
     })
   })
