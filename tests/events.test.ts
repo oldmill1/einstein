@@ -8,11 +8,11 @@ import first from "lodash/fp/first"
 import isEqual from "lodash/fp/isEqual"
 
 describe("Events", function () {
+  // Note: Auth is not required for GET
   describe("GET", function () {
     describe("/events/[id]", function () {
-      test("Gets a single event", async function () {
+      test("Gets a single event.", async function () {
         const getEvent = postman({
-          auth: true,
           query: {
             id: "632df76be97db3548e069c8a",
           },
@@ -26,9 +26,8 @@ describe("Events", function () {
         expect(id).toBeDefined()
         expect(received).toStrictEqual(expected)
       })
-      test("Handles event not found", async function () {
+      test("Handles event not found.", async function () {
         const getEvent = postman({
-          auth: true,
           query: {
             id: "something-else",
           },
@@ -36,9 +35,10 @@ describe("Events", function () {
         await eventHandler(getEvent.req, getEvent.res)
         expectFailure(getEvent.res)
       })
-      test("Handles 405", async function () {
+      // POST method is not supported on /events/[id]
+      // This test makes sure POSTs are handled.
+      test("Handles 405.", async function () {
         const wontWork = postman({
-          auth: true,
           method: "POST",
           body: {
             id: "632df76be97db3548e069c8a",
@@ -50,7 +50,7 @@ describe("Events", function () {
     })
     describe("/events", function () {
       // Get a list of events from the DB
-      test("Gets a list of events in the database", async function () {
+      test("Gets a list of events from the database.", async function () {
         // This list would be events that have been pre-created
         // for use in tests.
         const list = postman({})
@@ -60,7 +60,7 @@ describe("Events", function () {
         expect(received).toStrictEqual(expected)
       })
       // Filter: User
-      test("Get a list of events filtered by user", async function () {
+      test("Retrieves Ankur's events.", async function () {
         const defaultUserId = first(mockData.users)!.id
         const byUser = postman({
           query: {
@@ -74,7 +74,7 @@ describe("Events", function () {
         )
         expect(received).toStrictEqual(expected)
       })
-      test("Get a list of events by another user", async function () {
+      test("Retrieves Bob's events.", async function () {
         const bob = first(mockData.users.filter((u) => u.name === "Bob"))
         const bobId = bob!.id
         const byUser = postman({
@@ -89,8 +89,9 @@ describe("Events", function () {
       })
     })
   })
+  // Note: Auth is required for POST
   describe("POST", function () {
-    test("User can create a new event.", async function () {
+    test("Creates a new event.", async function () {
       const newEvent = postman({
         method: "POST",
         auth: true,
