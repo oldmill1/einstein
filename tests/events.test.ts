@@ -10,6 +10,7 @@ import isEqual from "lodash/fp/isEqual"
 describe("Events", function () {
   // Note: Auth is not required for GET
   describe("GET", function () {
+    // Note: The tests below use "eventHandler"
     describe("/events/[id]", function () {
       test("Gets a single event.", async function () {
         const getEvent = postman({
@@ -35,8 +36,7 @@ describe("Events", function () {
         await eventHandler(getEvent.req, getEvent.res)
         expectFailure(getEvent.res)
       })
-      // POST method is not supported on /events/[id]
-      // This test makes sure POSTs are handled.
+      // Note: POST method is not supported on /events/[id]
       test("Handles 405.", async function () {
         const wontWork = postman({
           method: "POST",
@@ -48,6 +48,7 @@ describe("Events", function () {
         expect(wontWork.res._getStatusCode()).toBe(405)
       })
     })
+    // The tests below use "eventsHandler"
     describe("/events", function () {
       // Get a list of events from the DB
       test("Gets a list of events from the database.", async function () {
@@ -87,6 +88,24 @@ describe("Events", function () {
         const expected = mockData.events.filter((e) => isEqual(e.userId, bobId))
         expect(expected).toStrictEqual(received)
       })
+      // Filters: Date
+      // date: "June 21, 2022"
+      test("Retrieves events starting on a particular day.", async function () {
+        const juneDayEvents = postman({
+          query: {
+            date: "June 21, 2022",
+          },
+        })
+        await eventsHandler(juneDayEvents.req, juneDayEvents.res)
+        const received = juneDayEvents.res._getData()
+        const expected = mockData.events.filter((e) =>
+          isEqual(e.startDate, new Date("June 21, 2022"))
+        )
+        expect(expected).toStrictEqual(received)
+      })
+      // between: { "Date 1", "Date 2" }
+      // gte: "Some Date"
+      // lte: "Some Date"
     })
   })
   // Note: Auth is required for POST

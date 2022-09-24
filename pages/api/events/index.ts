@@ -47,40 +47,56 @@ export default validateSignature(async function eventsHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  const { query, method } = req
-  // Handler GET request:
+  const method = get("method", req)
+  // Handle GET request:
   if (isEqual(method, "GET")) {
-    // Returning events:
-    // Check for filters (passed in using query params)
-    // Return some events if there is no filter passed in
-    if (isEmpty(query)) {
-      // Get some events using prisma and return using res
-      const events = await prisma.event.findMany()
-      return res.status(200).send(events)
-    }
-    // Filters:
-    // If the `userId` filter is present,
-    // only return events that belong to that person.
-    const userId = get("userId", query)
-    // Type check needed for Prisma findMany
-    // and also for us to be sane
-    if (userId && typeof userId === "string" && validObjectId.test(userId)) {
-      const events = await prisma.event.findMany({
-        where: {
-          userId,
-        },
-      })
-      return res.status(200).send(events)
-    }
-    return res.status(400).send({
-      message: "Something went wrong.",
-    })
+    return await handleGet(req, res)
   }
   // Handle a POST request:
   if (isEqual(method, "POST")) {
     return await handlePost(req, res)
   }
 })
+
+async function handleGet(req: NextApiRequest, res: NextApiResponse) {
+  // Returning events:
+  // Check for filters (passed in using query params)
+  // Return some events if there is no filter passed in
+  const { query } = req
+  if (isEmpty(query)) {
+    // Get some events using prisma and return using res
+    const events = await prisma.event.findMany()
+    return res.status(200).send(events)
+  }
+  // Filters:
+  // If the `userId` filter is present,
+  // only return events that belong to that person.
+  const userId = get("userId", query)
+  // Type check needed for Prisma findMany
+  // and also for us to be sane
+  if (userId && typeof userId === "string" && validObjectId.test(userId)) {
+    const events = await prisma.event.findMany({
+      where: {
+        userId,
+      },
+    })
+    return res.status(200).send(events)
+  }
+  const date = get("date", query)
+  if (date && typeof date === "string") {
+    const events = await prisma.event.findMany({
+      where: {
+        startDate: {
+          equals: new Date(date),
+        },
+      },
+    })
+    return res.status(200).send(events)
+  }
+  return res.status(400).send({
+    message: "Something went wrong.",
+  })
+}
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { body, method } = req
