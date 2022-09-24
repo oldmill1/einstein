@@ -124,7 +124,35 @@ describe("Events", function () {
         expect(expected).toStrictEqual(received)
       })
       // gte: "Some Date"
+      test("Retrieves events after a given date.", async function () {
+        const sample = "September 1, 2022"
+        const after = postman({
+          query: {
+            gte: sample,
+          },
+        })
+        await eventsHandler(after.req, after.res)
+        const received = after.res._getData()
+        const expected = mockData.events.filter(
+          (e) => e.startDate >= new Date(sample)
+        )
+        expect(expected).toStrictEqual(received)
+      })
       // lte: "Some Date"
+      test("Retrieves events before a given date", async function () {
+        const sample = "September 1, 2022"
+        const before = postman({
+          query: {
+            lte: sample,
+          },
+        })
+        await eventsHandler(before.req, before.res)
+        const received = before.res._getData()
+        const expected = mockData.events.filter(
+          (e) => e.startDate <= new Date(sample)
+        )
+        expect(expected).toStrictEqual(received)
+      })
     })
   })
   // Note: Auth is required for POST

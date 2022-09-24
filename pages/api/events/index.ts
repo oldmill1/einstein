@@ -68,7 +68,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     const events = await prisma.event.findMany()
     return res.status(200).send(events)
   }
-  // Filters:
+  // Filters: userId
   // If the `userId` filter is present,
   // only return events that belong to that person.
   const userId = get("userId", query)
@@ -81,6 +81,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     })
     return res.status(200).send(events)
   }
+  // Date Filters:
   // Get a list of events using date EQUALS
   const date = get("date", query)
   if (date && typeof date === "string") {
@@ -93,7 +94,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     })
     return res.status(200).send(events)
   }
-  // Get a list of events using lte & gte
+  // Get a list of events using interval
   const interval = get("interval", query)
   if (interval && typeof interval === "object") {
     const lte = get("lte", interval) as string
@@ -108,7 +109,30 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     })
     return res.status(200).send(events)
   }
-
+  // Get a list of events using gte
+  const gte = get("gte", query)
+  if (gte && typeof gte === "string") {
+    const events = await prisma.event.findMany({
+      where: {
+        startDate: {
+          gte: new Date(gte),
+        },
+      },
+    })
+    return res.status(200).send(events)
+  }
+  // Get a list of events using lte
+  const lte = get("lte", query)
+  if (lte && typeof lte === "string") {
+    const events = await prisma.event.findMany({
+      where: {
+        startDate: {
+          lte: new Date(lte),
+        },
+      },
+    })
+    return res.status(200).send(events)
+  }
   // Else All:
   return res.status(400).send({
     message: "Something went wrong.",
@@ -116,7 +140,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { body, method } = req
+  const { body } = req
   // Unpack the body
   let startDate = get("startDate", body)
   let finishDate = get("finishDate", body)
