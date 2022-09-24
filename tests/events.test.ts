@@ -47,6 +47,16 @@ describe("Events", function () {
         expect(wontWork.res._getStatusCode()).toBe(405)
       })
     })
+    describe("/events", function () {
+      // Get a list of events from the DB
+      test("Gets a list of events in the database", async function () {
+        const list = postman({})
+        await eventsHandler(list.req, list.res)
+        const received = list.res._getData()
+        const expected = mockData.events
+        expect(received).toStrictEqual(expected)
+      })
+    })
   })
   describe("POST", function () {
     test("User can create a new event.", async function () {

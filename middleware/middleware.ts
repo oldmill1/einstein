@@ -29,6 +29,9 @@ export function validateEmailAndPassword(fn: NextApiHandler) {
 
 export function validateSignature(fn: NextApiHandler) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
+    if (req.method === "GET") {
+      return await fn(req, res)
+    }
     if (!process.env.API_SECRET) {
       return res.status(400).send({ message: "Something went wrong." })
     }

@@ -46,6 +46,11 @@ export default validateSignature(async function eventsHandler(
   res: NextApiResponse
 ): Promise<void> {
   const { body, method } = req
+  if (isEqual(method, "GET")) {
+    // Return events
+    const events = await prisma.event.findMany()
+    return res.status(200).send(events)
+  }
   // Handle a POST request...
   if (isEqual(method, "POST")) {
     // Unpack the body
