@@ -74,6 +74,19 @@ describe("Events", function () {
         )
         expect(received).toStrictEqual(expected)
       })
+      test("Get a list of events by another user", async function () {
+        const bob = first(mockData.users.filter((u) => u.name === "Bob"))
+        const bobId = bob!.id
+        const byUser = postman({
+          query: {
+            userId: bobId,
+          },
+        })
+        await eventsHandler(byUser.req, byUser.res)
+        const received = byUser.res._getData()
+        const expected = mockData.events.filter((e) => isEqual(e.userId, bobId))
+        expect(expected).toStrictEqual(received)
+      })
     })
   })
   describe("POST", function () {
