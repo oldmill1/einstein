@@ -8,6 +8,7 @@ import { z } from "zod"
 import get from "lodash/fp/get"
 import compareAsc from "date-fns/compareAsc"
 import isEmpty from "lodash/fp/isEmpty"
+const validObjectId = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
 
 function validateStartFinishDates(
   startDate: Date,
@@ -63,7 +64,7 @@ export default validateSignature(async function eventsHandler(
     const userId = get("userId", query)
     // Type check needed for Prisma findMany
     // and also for us to be sane
-    if (userId && typeof userId === "string") {
+    if (userId && typeof userId === "string" && validObjectId.test(userId)) {
       const events = await prisma.event.findMany({
         where: {
           userId,
