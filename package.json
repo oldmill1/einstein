@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch --verbose --runInBand",
-    "jest": "jest --runInBand"
+    "jest": "jest --verbose --runInBand"
   },
   "dependencies": {
     "@prisma/client": "4.3.1",

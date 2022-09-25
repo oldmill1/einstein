@@ -14,11 +14,17 @@ export function postman({
       ...args,
       method: "GET",
     }
-  }
-  if (method === "POST") {
+  } else {
     args = {
       ...args,
-      method: "POST",
+      method: method,
+      body,
+    }
+  }
+  if (method === "UPDATE") {
+    args = {
+      ...args,
+      method: "UPDATE",
       body,
     }
   }

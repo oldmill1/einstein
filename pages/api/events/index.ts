@@ -10,6 +10,34 @@ import compareAsc from "date-fns/compareAsc"
 import isEmpty from "lodash/fp/isEmpty"
 const validObjectId = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
 
+function validateUserInput(req: NextApiRequest) {
+  const { body } = req
+  // Unpack the body
+  let startDate = get("startDate", body)
+  let finishDate = get("finishDate", body)
+  if (typeof startDate === "string") {
+    startDate = new Date(startDate)
+  }
+  if (typeof finishDate === "string") {
+    finishDate = new Date(finishDate)
+  }
+  // Validate user input:
+  const errorMessage = validateStartFinishDates(startDate, finishDate)
+  if (errorMessage) {
+    return {
+      data: null,
+      errorMessage: errorMessage,
+    }
+  }
+  return {
+    data: {
+      startDate,
+      finishDate,
+    },
+    errorMessage: null,
+  }
+}
+
 function validateStartFinishDates(
   startDate: Date,
   finishDate: Date
@@ -64,7 +92,80 @@ export default validateSignature(async function eventsHandler(
   if (isEqual(method, "POST")) {
     return await postHandler(req, res)
   }
+
+  // Handle an UPDATE request:
+  // Updates an existing record.
+  if (isEqual(method, "UPDATE")) {
+    return await updateHandler(req, res)
+  }
+
+  return res.status(400).send({
+    message: "Something went wrong.",
+  })
 })
+
+async function updateHandler(req: NextApiRequest, res: NextApiResponse) {
+  // Takes raw user input
+  const body = get("body", req)
+  const { data, errorMessage } = validateUserInput(req)
+  if (errorMessage) {
+    return res.status(400).send({ message: errorMessage })
+  }
+  // Returns clean data back
+  const startDate = get("startDate", data)
+  const finishDate = get("finishDate", data)
+  // Grab the ObjectId we want to query against from the body of the request.
+  const id = get("id", body)
+  // Check if event ID is a valid object id.
+  if (typeof id === "string" && validObjectId.test(id)) {
+    // Query the event table for the id provided in the request
+    const event = await prisma.event.findUnique({
+      where: {
+        id,
+      },
+    })
+    // Note: Standard boilerplate-ish code coming up; It verifies a jsw token
+    // The sample here is taken from the official documentation from jsonwebtoken
+    if (event) {
+      // Note: `validateSignature` has verified the request is authentic
+      // We just need to check if the request is signed by the same
+      // user as the userId on the event obtained earlier
+      let apiSecret: Secret = process.env.API_SECRET as string
+      return verify(
+        req.headers.authorization!,
+        apiSecret,
+        async function (err, decoded) {
+          if (!err && decoded) {
+            const eventUserId = get("userId", event)
+            const sub = get("sub", decoded)
+            if (isEqual(sub, eventUserId)) {
+              // The user here has permission to update the event
+              // Finally, we can update using the prima client
+              const updatedEvent = await prisma.event.update({
+                where: {
+                  id,
+                },
+                data: {
+                  startDate,
+                  finishDate,
+                },
+              })
+              if (updatedEvent) {
+                return res.status(200).send(updatedEvent)
+              }
+            }
+          }
+          // Error during verification
+          return res.status(400).send({ message: "Something went wrong." })
+        }
+      )
+    }
+  }
+  // Else All:
+  return res.status(400).send({
+    message: "Something went wrong.",
+  })
+}
 
 // Handle GET requests to /events
 // Returns an optionally filtered list of records.
@@ -155,22 +256,13 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 // Creates a new event record.
 // Performs a create Primsa query.
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { body } = req
-  // Unpack the body
-  let startDate = get("startDate", body)
-  let finishDate = get("finishDate", body)
-  if (typeof startDate === "string") {
-    startDate = new Date(startDate)
-  }
-  if (typeof finishDate === "string") {
-    finishDate = new Date(finishDate)
-  }
   // Validate user input:
-  const errorMessage = validateStartFinishDates(startDate, finishDate)
+  const { data, errorMessage } = validateUserInput(req)
   if (errorMessage) {
     return res.status(400).send({ message: errorMessage })
   }
-
+  const startDate = get("startDate", data)
+  const finishDate = get("finishDate", data)
   // An event belongs to a user.
   // The user is passed in through an authorisation header.
   // Verify that auth token is authentic using jsonwebtoken

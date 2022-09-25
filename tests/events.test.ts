@@ -7,6 +7,7 @@ import { mockData } from "./helpers/fixtures"
 import first from "lodash/fp/first"
 import isEqual from "lodash/fp/isEqual"
 
+// File: pages/api/events/index.ts
 describe("Events", function () {
   // Note: Auth is not required for GET
   describe("GET", function () {
@@ -155,7 +156,7 @@ describe("Events", function () {
       })
     })
   })
-  // Note: Auth is required for POST
+  // Note: Auth is required for POST, UPDATE and DELETE
   describe("POST", function () {
     test("Creates a new event.", async function () {
       const newEvent = postman({
@@ -275,6 +276,24 @@ describe("Events", function () {
       const received = same.res._getData()
       const message = get("message", received)
       expect(message).toBe("Check dates.")
+    })
+  })
+  describe("UPDATE", function () {
+    test("Updates an event with new data", async function () {
+      const update = postman({
+        method: "UPDATE",
+        body: {
+          startDate: new Date("December 1 , 2022"),
+          finishDate: new Date("December 2, 2022"),
+          id: "632df76be97db3548e069c8a",
+        },
+        auth: true,
+      })
+      await eventsHandler(update.req, update.res)
+      const received = update.res._getData()
+      const expected = mockData.updatedEvent
+      expect(received.startDate).toStrictEqual(expected.startDate)
+      expect(received.finishDate).toStrictEqual(expected.finishDate)
     })
   })
 })
