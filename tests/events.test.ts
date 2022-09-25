@@ -295,5 +295,21 @@ describe("Events", function () {
       expect(received.startDate).toStrictEqual(expected.startDate)
       expect(received.finishDate).toStrictEqual(expected.finishDate)
     })
+    test("Prevents updating an event owned by someone else.", async function () {
+      const update = postman({
+        method: "UPDATE",
+        body: {
+          startDate: new Date("December 1 , 2022"),
+          finishDate: new Date("December 2, 2022"),
+          id: "632df76be97db3548e069c8a",
+        },
+        auth: true,
+        authKeyName: "BOB_PUBLIC_KEY",
+      })
+      await eventsHandler(update.req, update.res)
+      const received = update.res._getData()
+      const message = get("message", received)
+      expect(message).toBe("Something went wrong.")
+    })
   })
 })

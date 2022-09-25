@@ -10,11 +10,25 @@ import compareAsc from "date-fns/compareAsc"
 import isEmpty from "lodash/fp/isEmpty"
 const validObjectId = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
 
-function validateUserInput(req: NextApiRequest) {
-  const { body } = req
+interface iValidateUserInput {
+  data: {
+    startDate: Date
+    finishDate: Date
+  } | null
+  errorMessage: string | null
+}
+function validateUserInput(req: NextApiRequest): iValidateUserInput {
   // Unpack the body
+  const body = get("body", req)
   let startDate = get("startDate", body)
   let finishDate = get("finishDate", body)
+  // For tomorrow:
+  // if it is string? It should either be expected to be string or not.
+  // Ideally, the code should pass without the next check of code even being there.
+  // There should be no need to do: finishDate = new Date(finishDate)
+  // or there should _always_ be a reason to do it, but not both
+  // Todo: Remove all instances in tests where we are passing a
+  // Date() and instead pass a String "Tuesday, Aug 31, 2022
   if (typeof startDate === "string") {
     startDate = new Date(startDate)
   }
@@ -290,20 +304,22 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
             // Finally, insert the new event into the database
             // using the prisma client(), taking note to
             // use `npx prisma generate` at least once.
-            const newEventCreated = await prisma.event.create({
-              data: {
-                startDate,
-                finishDate,
-                // The new event is connected to the user
-                // that was provided in authorization token
-                user: {
-                  connect: {
-                    id: match.id,
+            if (startDate && finishDate) {
+              const newEventCreated = await prisma.event.create({
+                data: {
+                  startDate,
+                  finishDate,
+                  // The new event is connected to the user
+                  // that was provided in authorization token
+                  user: {
+                    connect: {
+                      id: match.id,
+                    },
                   },
                 },
-              },
-            })
-            return res.status(200).send(newEventCreated)
+              })
+              return res.status(200).send(newEventCreated)
+            }
           }
         }
       }
