@@ -9,7 +9,8 @@ import isEqual from "lodash/fp/isEqual"
 
 // File: pages/api/events/index.ts
 describe("Events", function () {
-  // Note: Auth is not required for GET
+  // An Authentication header is not required for GET requests.
+  // `postman` in the liens below is not configured with an auth param.
   describe("GET", function () {
     // Note: The tests below use "eventHandler"
     describe("/events/[id]", function () {
@@ -169,7 +170,8 @@ describe("Events", function () {
       })
     })
   })
-  // Note: Auth is required for POST, UPDATE and DELETE
+  // An Authentication header is required for POST, UPDATE and DELETE requests.
+  // `postman` in the lines below is configured with `auth: true`
   describe("POST", function () {
     test("Creates a new event.", async function () {
       const newEvent = postman({
@@ -415,4 +417,5 @@ describe("Events", function () {
       expect(message).toBe("The field `finishDate` was not a date.")
     })
   })
+  describe("DELETE", function () {})
 })
