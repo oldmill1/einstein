@@ -312,15 +312,107 @@ describe("Events", function () {
         body: {
           startDate: "December 1 , 2022",
           finishDate: "December 2, 2022",
+          // This event is owned by "Ankur" user
+          // and cannot be updated by Bob
           id: "632df76be97db3548e069c8a",
         },
         auth: true,
+        // Note: This request will look like its coming from Bob.
         authKeyName: "BOB_PUBLIC_KEY",
       })
       await eventsHandler(update.req, update.res)
       const received = update.res._getData()
       const message = get("message", received)
       expect(message).toBe("Something went wrong.")
+    })
+    test("Prevents updating with some missing dates.", async function () {
+      const response = postman({
+        method: "UPDATE",
+        body: {
+          startDate: "December 1 , 2022",
+          // Note: finishDate is missing
+          id: "632df76be97db3548e069c8a",
+        },
+        auth: true,
+      })
+      await eventsHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(message).toBe("The field `finishDate` was not a date.")
+    })
+    test("Prevents updating with mixed-up dates.", async function () {
+      const response = postman({
+        method: "UPDATE",
+        body: {
+          startDate: "December 3 , 2022",
+          finishDate: "December 2, 2022",
+          id: "632df76be97db3548e069c8a",
+        },
+        auth: true,
+      })
+      await eventsHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(message).toBe("Check dates.")
+    })
+    test("Handles unsigned request.", async function () {
+      const response = postman({
+        method: "POST",
+        body: {
+          startDate: "December 1 , 2022",
+          finishDate: "December 2, 2022",
+        },
+        // Note: Testing missing an "auth" header.
+      })
+      await eventsHandler(response.req, response.res)
+      expect(response.res._getStatusCode()).toBe(401)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(message).toBe("Not authorized.")
+    })
+    test("Handles start dates are the same", async function () {
+      const response = postman({
+        method: "POST",
+        body: {
+          startDate: "December 1 , 2022",
+          finishDate: "December 1, 2022",
+        },
+        auth: true,
+      })
+      await eventsHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(message).toBe("Check dates.")
+    })
+    test("Handles invalid startDate.", async function () {
+      const response = postman({
+        method: "UPDATE",
+        auth: true,
+        body: {
+          startDate: "XYZ",
+          finishDate: "November 17, 2022",
+        },
+      })
+      await eventsHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(message).toBeDefined()
+      expect(message).toBe("The field `startDate` was not a date.")
+    })
+    test("Handles invalid finishDate.", async function () {
+      const response = postman({
+        method: "UPDATE",
+        auth: true,
+        body: {
+          startDate: "November 17, 2022",
+          finishDate: "XXX",
+        },
+      })
+      await eventsHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(message).toBeDefined()
+      expect(message).toBe("The field `finishDate` was not a date.")
     })
   })
 })
