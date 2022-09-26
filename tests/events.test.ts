@@ -9,6 +9,9 @@ import isEqual from "lodash/fp/isEqual"
 
 // File: pages/api/events/index.ts
 describe("Events", function () {
+  let newPostId: string | null = null
+  let newPostStartDate = new Date("2022-11-16T05:00:00.000Z")
+  let newPostFinishDate = new Date("2022-11-17T05:00:00.000Z")
   // An Authentication header is not required for GET requests.
   // `postman` in the liens below is not configured with an auth param.
   describe("GET", function () {
@@ -173,13 +176,16 @@ describe("Events", function () {
   // An Authentication header is required for POST, UPDATE and DELETE requests.
   // `postman` in the lines below is configured with `auth: true`
   describe("POST", function () {
+    // Note: This creates a side effect. It modifies the test database by
+    // adding a record to the event table. We will clean up after ourselves
+    // later in this file when we delete this event in the DELETE tests.
     test("Creates a new event.", async function () {
       const newEvent = postman({
         method: "POST",
         auth: true,
         body: {
-          startDate: "November 16, 2022",
-          finishDate: "November 17, 2022",
+          startDate: newPostStartDate,
+          finishDate: newPostFinishDate,
         },
       })
       await eventsHandler(newEvent.req, newEvent.res)
@@ -187,6 +193,7 @@ describe("Events", function () {
       const received = newEvent.res._getData()
       const id = get("id", received)
       expect(id).toBeDefined()
+      newPostId = id
     })
     test("Handles absent startDate.", async function () {
       const absentSDate = postman({
@@ -417,5 +424,20 @@ describe("Events", function () {
       expect(message).toBe("The field `finishDate` was not a date.")
     })
   })
-  describe("DELETE", function () {})
+  describe("DELETE", function () {
+    test("Deletes an event.", async function () {
+      // Clean up after ourselves
+      const response = postman({
+        method: "DELETE",
+        body: {
+          // Note: This was the post that was created earlier
+          id: newPostId,
+        },
+      })
+      await eventHandler(response.req, response.res)
+      const received = response.res._getData()
+      expect(received.startDate).toStrictEqual(newPostStartDate)
+      expect(received.finishDate).toStrictEqual(newPostFinishDate)
+    })
+  })
 })
