@@ -20,14 +20,16 @@ interface iValidateUserInput {
 function validateUserInput(req: NextApiRequest): iValidateUserInput {
   // Unpack the body
   const body = get("body", req)
-  // Expect: formatted date string
   const startsAt = get("startDate", body)
   const finishesAt = get("finishDate", body)
-  // Turn it into a Date object
+  // Turn params into Date objects
   const startDate: Date = new Date(startsAt)
   const finishDate: Date = new Date(finishesAt)
   // Validate user input:
-  const errorMessage = validateStartFinishDates(startDate, finishDate)
+  const errorMessage: string | null = validateStartFinishDates(
+    startDate,
+    finishDate
+  )
   if (errorMessage) {
     return {
       data: null,
