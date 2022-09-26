@@ -163,8 +163,8 @@ describe("Events", function () {
         method: "POST",
         auth: true,
         body: {
-          startDate: new Date("November 16, 2022"),
-          finishDate: new Date("November 17, 2022"),
+          startDate: "November 16, 2022",
+          finishDate: "November 17, 2022",
         },
       })
       await eventsHandler(newEvent.req, newEvent.res)
@@ -178,14 +178,14 @@ describe("Events", function () {
         method: "POST",
         auth: true,
         body: {
-          finishDate: new Date("November 17, 2022"),
+          finishDate: "November 17, 2022",
         },
       })
       await eventsHandler(absentSDate.req, absentSDate.res)
       const received = absentSDate.res._getData()
       const message = get("message", received)
       expect(message).toBeDefined()
-      expect(message).toBe("The field `startDate` or `finishDate` was absent.")
+      expect(message).toBe("The field `startDate` was not a date.")
     })
     test("Handles invalid startDate.", async function () {
       const invalidSDate = postman({
@@ -193,7 +193,7 @@ describe("Events", function () {
         auth: true,
         body: {
           startDate: "XYZ",
-          finishDate: new Date("November 17, 2022"),
+          finishDate: "November 17, 2022",
         },
       })
       await eventsHandler(invalidSDate.req, invalidSDate.res)
@@ -207,23 +207,21 @@ describe("Events", function () {
         method: "POST",
         auth: true,
         body: {
-          startDate: new Date("November 16, 2022"),
+          startDate: "November 16, 2022",
         },
       })
       await eventsHandler(absentFDate.req, absentFDate.res)
       const received = absentFDate.res._getData()
       const message = get("message", received)
       expect(message).toBeDefined()
-      expect(message).toEqual(
-        "The field `startDate` or `finishDate` was absent."
-      )
+      expect(message).toEqual("The field `finishDate` was not a date.")
     })
     test("Handles invalid finishDate.", async function () {
       const invalidFDate = postman({
         method: "POST",
         auth: true,
         body: {
-          startDate: new Date("November 16, 2022"),
+          startDate: "November 16, 2022",
           finishDate: "XYZ",
         },
       })
@@ -237,8 +235,8 @@ describe("Events", function () {
       const unsigned = postman({
         method: "POST",
         body: {
-          startDate: new Date("November 16, 2022"),
-          finishDate: new Date("November 17, 2022"),
+          startDate: "November 16, 2022",
+          finishDate: "November 17, 2022",
         },
       })
       await eventsHandler(unsigned.req, unsigned.res)
@@ -251,8 +249,8 @@ describe("Events", function () {
       const same = postman({
         method: "POST",
         body: {
-          startDate: new Date("November 16, 2022"),
-          finishDate: new Date("November 16, 2022"),
+          startDate: "November 16, 2022",
+          finishDate: "November 16, 2022",
         },
         auth: true,
       })
@@ -266,8 +264,8 @@ describe("Events", function () {
       const same = postman({
         method: "POST",
         body: {
-          startDate: new Date("December 1 , 2022"),
-          finishDate: new Date("November 30, 2022"),
+          startDate: "December 1 , 2022",
+          finishDate: "November 30, 2022",
         },
         auth: true,
       })
@@ -283,8 +281,8 @@ describe("Events", function () {
       const update = postman({
         method: "UPDATE",
         body: {
-          startDate: new Date("December 1 , 2022"),
-          finishDate: new Date("December 2, 2022"),
+          startDate: "December 1 , 2022",
+          finishDate: "December 2, 2022",
           id: "632df76be97db3548e069c8a",
         },
         auth: true,
@@ -299,8 +297,8 @@ describe("Events", function () {
       const update = postman({
         method: "UPDATE",
         body: {
-          startDate: new Date("December 1 , 2022"),
-          finishDate: new Date("December 2, 2022"),
+          startDate: "December 1 , 2022",
+          finishDate: "December 2, 2022",
           id: "632df76be97db3548e069c8a",
         },
         auth: true,

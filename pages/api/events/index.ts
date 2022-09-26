@@ -20,21 +20,12 @@ interface iValidateUserInput {
 function validateUserInput(req: NextApiRequest): iValidateUserInput {
   // Unpack the body
   const body = get("body", req)
-  let startDate = get("startDate", body)
-  let finishDate = get("finishDate", body)
-  // For tomorrow:
-  // if it is string? It should either be expected to be string or not.
-  // Ideally, the code should pass without the next check of code even being there.
-  // There should be no need to do: finishDate = new Date(finishDate)
-  // or there should _always_ be a reason to do it, but not both
-  // Todo: Remove all instances in tests where we are passing a
-  // Date() and instead pass a String "Tuesday, Aug 31, 2022
-  if (typeof startDate === "string") {
-    startDate = new Date(startDate)
-  }
-  if (typeof finishDate === "string") {
-    finishDate = new Date(finishDate)
-  }
+  // Expect: formatted date string
+  const startsAt = get("startDate", body)
+  const finishesAt = get("finishDate", body)
+  // Turn it into a Date object
+  const startDate: Date = new Date(startsAt)
+  const finishDate: Date = new Date(finishesAt)
   // Validate user input:
   const errorMessage = validateStartFinishDates(startDate, finishDate)
   if (errorMessage) {
@@ -58,11 +49,6 @@ function validateStartFinishDates(
 ): string | null {
   // Note: Once we encounter an error, we return immediately
   let error: string | null = null
-  // Check if required fields are present
-  if (!startDate || !finishDate) {
-    error = "The field `startDate` or `finishDate` was absent."
-    return error
-  }
   // Validate the startDate field
   try {
     z.date().parse(startDate)
