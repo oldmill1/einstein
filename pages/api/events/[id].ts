@@ -5,6 +5,12 @@ import get from "lodash/fp/get"
 const prisma = new PrismaClient()
 const validObjectId = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i
 
+/**
+ * Request handler for /events/[id]
+ * Tests: /tests/events.test.ts
+ * @param req
+ * @param res
+ */
 export default async function eventHandler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -31,10 +37,11 @@ export default async function eventHandler(
     },
   })
   if (event) {
+    // 💗
     return res.status(200).send(event)
   } else {
-    return res.status(400).send({
-      message: "Something went wrong.",
+    return res.status(404).send({
+      message: "Event id " + id + " not found.",
     })
   }
 }

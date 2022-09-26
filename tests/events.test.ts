@@ -37,6 +37,19 @@ describe("Events", function () {
         await eventHandler(getEvent.req, getEvent.res)
         expectFailure(getEvent.res)
       })
+      test("Handles 404.", async function () {
+        const getEvent = postman({
+          query: {
+            id: "63320bff321283545b1f986c",
+          },
+        })
+        await eventHandler(getEvent.req, getEvent.res)
+        const received = getEvent.res._getData()
+        const message = get("message", received)
+        expect(message).toStrictEqual(
+          "Event id 63320bff321283545b1f986c not found."
+        )
+      })
       // Note: POST method is not supported on /events/[id]
       test("Handles 405.", async function () {
         const wontWork = postman({
