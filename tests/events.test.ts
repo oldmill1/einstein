@@ -39,7 +39,9 @@ describe("Events", function () {
           },
         })
         await eventHandler(getEvent.req, getEvent.res)
-        expectFailure(getEvent.res)
+        const received = getEvent.res._getData()
+        const message = get("message", received)
+        expect(message).toStrictEqual("Error validating user input.")
       })
       test("Handles 404.", async function () {
         const getEvent = postman({
@@ -433,11 +435,27 @@ describe("Events", function () {
           // Note: This was the post that was created earlier
           id: newPostId,
         },
+        auth: true,
       })
       await eventHandler(response.req, response.res)
       const received = response.res._getData()
       expect(received.startDate).toStrictEqual(newPostStartDate)
       expect(received.finishDate).toStrictEqual(newPostFinishDate)
+    })
+    test.skip("Prevents deleting another user's event on accident.", async function () {
+      const response = postman({
+        method: "DELETE",
+        body: {
+          id: "632df76be97db3548e069c8a", // Ankur's event...
+        },
+        // Note: This request will look like its coming from Bob.
+        authKeyName: "BOB_PUBLIC_KEY", // ...Bob's Key
+      })
+      await eventHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(response.res._getStatusCode()).toBe(401)
+      expect(message).toBe("Not authorized.")
     })
   })
 })
