@@ -182,6 +182,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   if (isEmpty(query)) {
     // Get some events using prisma and return using res.
     const events = await prisma.event.findMany()
+    // 💗
     return res.status(200).send(events)
   }
   // Handle Filters:
@@ -197,6 +198,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         userId,
       },
     })
+    // 💗
     return res.status(200).send(events)
   }
   // Date Filters:
@@ -210,6 +212,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         },
       },
     })
+    // 💗
     return res.status(200).send(events)
   }
   // Get a list of events using interval
@@ -225,6 +228,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         },
       },
     })
+    // 💗
     return res.status(200).send(events)
   }
   // Get a list of events using gte
@@ -237,6 +241,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         },
       },
     })
+    // 💗
     return res.status(200).send(events)
   }
   // Get a list of events using lte
@@ -249,6 +254,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         },
       },
     })
+    // 💗
     return res.status(200).send(events)
   }
   // Else All:
@@ -309,6 +315,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
                   },
                 },
               })
+              // 💗
               return res.status(200).send(newEventCreated)
             }
           }
