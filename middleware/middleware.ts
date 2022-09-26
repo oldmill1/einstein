@@ -3,7 +3,7 @@ import { z } from "zod"
 import get from "lodash/fp/get"
 import { Secret, verify } from "jsonwebtoken"
 
-export function validateEmailAndPassword(fn: NextApiHandler) {
+export function emailAndPassMiddleware(fn: NextApiHandler) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
     const email = get("body.email", req)
     if (!email) {
@@ -27,7 +27,7 @@ export function validateEmailAndPassword(fn: NextApiHandler) {
   }
 }
 
-export function validateSignature(fn: NextApiHandler) {
+export function authMiddleware(fn: NextApiHandler) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "GET") {
       return await fn(req, res)

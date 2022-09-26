@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import get from "lodash/fp/get"
 import { PrismaClient } from "@prisma/client"
-import { validateEmailAndPassword } from "../../../middleware/middleware"
+import { emailAndPassMiddleware } from "../../../middleware/middleware"
 import { Secret, sign } from "jsonwebtoken"
 import { compare } from "bcrypt"
 const prisma = new PrismaClient()
 
-export default validateEmailAndPassword(async function loginHandler(
+export default emailAndPassMiddleware(async function loginHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {

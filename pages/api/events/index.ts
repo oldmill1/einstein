@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import isEqual from "lodash/fp/isEqual"
 import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
-import { validateSignature } from "../../../middleware/middleware"
+import { authMiddleware } from "../../../middleware/middleware"
 import { Secret, verify } from "jsonwebtoken"
 import { z } from "zod"
 import get from "lodash/fp/get"
@@ -26,10 +26,7 @@ function validateUserInput(req: NextApiRequest): iValidateUserInput {
   const startDate: Date = new Date(startsAt)
   const finishDate: Date = new Date(finishesAt)
   // Validate user input:
-  const errorMessage: string | null = validateStartFinishDates(
-    startDate,
-    finishDate
-  )
+  const errorMessage: string | null = isDatePairValid(startDate, finishDate)
   if (errorMessage) {
     return {
       data: null,
@@ -41,14 +38,20 @@ function validateUserInput(req: NextApiRequest): iValidateUserInput {
       startDate,
       finishDate,
     },
-    errorMessage: null,
+    errorMessage,
   }
 }
 
-function validateStartFinishDates(
-  startDate: Date,
-  finishDate: Date
-): string | null {
+/**
+ * Validates if two Date objects, s and f, "make sense"
+ * the way they are passed in, in the sense that the
+ * f comes after the s, etc.
+ *
+ * Returns an error string; or null.
+ * @param startDate
+ * @param finishDate
+ */
+function isDatePairValid(startDate: Date, finishDate: Date): string | null {
   // Note: Once we encounter an error, we return immediately
   let error: string | null = null
   // Validate the startDate field
@@ -79,7 +82,7 @@ function validateStartFinishDates(
  * POST: Creates a new event
  * Tests: tests/events.test.js
  */
-export default validateSignature(async function eventsHandler(
+export default authMiddleware(async function eventsHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {

@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { z } from "zod"
 import { hash } from "bcrypt"
 import { PrismaClient } from "@prisma/client"
-import { validateEmailAndPassword } from "../../../middleware/middleware"
+import { emailAndPassMiddleware } from "../../../middleware/middleware"
 const prisma = new PrismaClient()
 
 /**
@@ -18,7 +18,7 @@ const prisma = new PrismaClient()
  *
  * Test: tests/signup.test.ts
  */
-export default validateEmailAndPassword(async function signupHandler(
+export default emailAndPassMiddleware(async function signupHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
