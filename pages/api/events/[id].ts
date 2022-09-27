@@ -5,6 +5,7 @@ import {
   deleteEventMiddleware,
   validateObjectId,
 } from "../../../middleware/middleware"
+import get from "lodash/fp/get"
 
 const prisma = new PrismaClient()
 
@@ -62,12 +63,11 @@ const deleteHandler = deleteEventMiddleware(async function deleteHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Unpack body from request.
-  // Validate
-  const { id, errorMessage } = validateObjectId(req)
-  if (errorMessage) {
-    return res.status(400).send({ message: errorMessage })
-  }
+  // Note: This function passes through deleteEventMiddleware first!
+  // By the time you get here, the event id has already been verified
+  // to be valid and allowed to be deleted.
+  const body = get("body", req)
+  const id = get("id", body)
   const response = await prisma.event.delete({
     where: {
       id,
