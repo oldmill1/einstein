@@ -455,7 +455,9 @@ describe("Events", function () {
       const received = response.res._getData()
       const message = get("message", received)
       expect(response.res._getStatusCode()).toBe(401)
-      expect(message).toBe("Not authorized.")
+      expect(message).toBe(
+        `Error: Event id 632df76be97db3548e069c8a could not be deleted.`
+      )
     })
   })
 })
