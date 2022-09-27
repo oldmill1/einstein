@@ -1,8 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import isEqual from "lodash/fp/isEqual"
 import { PrismaClient } from "@prisma/client"
-import get from "lodash/fp/get"
-import { Secret, verify } from "jsonwebtoken"
 import {
   deleteEventMiddleware,
   validateUserInput,
@@ -20,16 +18,16 @@ export default async function eventHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  const { query, method, body } = req
-  // Handle GET request:
+  const { method } = req
+  // Handle GET:
   if (isEqual(method, "GET")) {
     return await getHandler(req, res)
   }
+  // Handle DELETE:
   if (isEqual(method, "DELETE")) {
     return await deleteHandler(req, res)
   }
-
-  // Else All:
+  // Return a 405 error for any other kind of request.
   return res.status(405).send({
     message: "Something went wrong",
   })
