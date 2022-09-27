@@ -31,7 +31,7 @@ export default async function eventHandler(
   }
   // Method not allowed is called a 405
   return res.status(405).send({
-    message: "Something went wrong",
+    message: "Method not allowed.",
   })
 }
 

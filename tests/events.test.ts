@@ -66,6 +66,10 @@ describe("Events", function () {
         })
         await eventHandler(wontWork.req, wontWork.res)
         expect(wontWork.res._getStatusCode()).toBe(405)
+        await eventHandler(wontWork.req, wontWork.res)
+        const received = wontWork.res._getData()
+        const message = get("message", received)
+        expect(message).toBe("Method not allowed.")
       })
     })
     // The tests below use "eventsHandler"
