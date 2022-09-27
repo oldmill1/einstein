@@ -3,14 +3,16 @@ import isEqual from "lodash/fp/isEqual"
 import { PrismaClient } from "@prisma/client"
 import {
   deleteEventMiddleware,
-  validateUserInput,
+  validateObjectId,
 } from "../../../middleware/middleware"
 
 const prisma = new PrismaClient()
 
 /**
  * Request handler for /events/[id]
+ * Methods allowed: GET, DELETE
  * Tests: /tests/events.test.ts
+ *
  * @param req
  * @param res
  */
@@ -27,7 +29,7 @@ export default async function eventHandler(
   if (isEqual(method, "DELETE")) {
     return await deleteHandler(req, res)
   }
-  // Return a 405 error for any other kind of request.
+  // Method not allowed is called a 405
   return res.status(405).send({
     message: "Something went wrong",
   })
@@ -35,7 +37,7 @@ export default async function eventHandler(
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   // Validate the input
-  const { id, errorMessage } = validateUserInput(req)
+  const { id, errorMessage } = validateObjectId(req)
   if (errorMessage) {
     return res.status(400).send({ message: errorMessage })
   }
@@ -62,7 +64,7 @@ const deleteHandler = deleteEventMiddleware(async function deleteHandler(
 ) {
   // Unpack body from request.
   // Validate
-  const { id, errorMessage } = validateUserInput(req)
+  const { id, errorMessage } = validateObjectId(req)
   if (errorMessage) {
     return res.status(400).send({ message: errorMessage })
   }

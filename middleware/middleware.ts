@@ -56,7 +56,7 @@ export function authMiddleware(fn: NextApiHandler) {
   }
 }
 
-export function validateUserInput(req: NextApiRequest) {
+export function validateObjectId(req: NextApiRequest) {
   const { query, method, body } = req
 
   const id = method === "GET" ? (get("id", query) as string) : get("id", body)
@@ -75,7 +75,7 @@ export function validateUserInput(req: NextApiRequest) {
 export function deleteEventMiddleware(fn: Function) {
   return async function (req: NextApiRequest, res: NextApiResponse) {
     // Unpack body from request and validate.
-    const { id, errorMessage } = validateUserInput(req)
+    const { id, errorMessage } = validateObjectId(req)
     if (errorMessage) {
       return res.status(400).send({ message: errorMessage })
     }
