@@ -442,7 +442,7 @@ describe("Events", function () {
       expect(received.startDate).toStrictEqual(newPostStartDate)
       expect(received.finishDate).toStrictEqual(newPostFinishDate)
     })
-    test.skip("Prevents deleting another user's event on accident.", async function () {
+    test("Prevents deleting another user's event on accident.", async function () {
       const response = postman({
         method: "DELETE",
         body: {
