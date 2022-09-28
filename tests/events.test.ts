@@ -13,7 +13,7 @@ describe("Events", function () {
   let newPostStartDate = new Date("2022-11-16T05:00:00.000Z")
   let newPostFinishDate = new Date("2022-11-17T05:00:00.000Z")
   // An Authentication header is not required for GET requests.
-  // `postman` in the liens below is not configured with an auth param.
+  // `postman` in the lines below is not configured with an auth param.
   describe("GET", function () {
     // Note: The tests below use "eventHandler"
     describe("/events/[id]", function () {
@@ -492,6 +492,21 @@ describe("Events", function () {
       expect(response.res._getStatusCode()).toBe(401)
       expect(message).toBe(
         `Error: Event id ${notFoundId} could not be deleted.`
+      )
+    })
+    test("Handles unsigned event", async function () {
+      const response = postman({
+        method: "DELETE",
+        body: {
+          id: "6333b457f1b698196bf544d0",
+        },
+      })
+      await eventHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(response.res._getStatusCode()).toBe(401)
+      expect(message).toBe(
+        `Error: Event id 6333b457f1b698196bf544d0 could not be deleted.`
       )
     })
   })
