@@ -463,5 +463,36 @@ describe("Events", function () {
         `Error: Event id 632df76be97db3548e069c8a could not be deleted.`
       )
     })
+    test("Handles deleting mock id", async function () {
+      const response = postman({
+        method: "DELETE",
+        body: {
+          id: "something-else",
+        },
+        auth: true,
+      })
+      await eventHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(response.res._getStatusCode()).toBe(400)
+      expect(message).toBe(`Error validating user input.`)
+    })
+    test("Handles deleting not a real id", async function () {
+      const notFoundId = "6333b457f1b698196bf544d0"
+      const response = postman({
+        method: "DELETE",
+        body: {
+          id: "6333b457f1b698196bf544d0",
+        },
+        auth: true,
+      })
+      await eventHandler(response.req, response.res)
+      const received = response.res._getData()
+      const message = get("message", received)
+      expect(response.res._getStatusCode()).toBe(401)
+      expect(message).toBe(
+        `Error: Event id ${notFoundId} could not be deleted.`
+      )
+    })
   })
 })
