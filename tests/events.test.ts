@@ -463,7 +463,7 @@ describe("Events", function () {
         `Error: Event id 632df76be97db3548e069c8a could not be deleted.`
       )
     })
-    test("Handles deleting mock id", async function () {
+    test("Handles deleting id 'something-else'", async function () {
       const response = postman({
         method: "DELETE",
         body: {
